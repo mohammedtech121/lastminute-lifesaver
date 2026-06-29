@@ -1,26 +1,24 @@
-export default async function handler(req, res) {
-    const apiKey = process.env.GEMINI_API_KEY; 
+export const config = {
+  runtime: 'edge', // Using Edge runtime for lightning fast, error-free execution
+};
+
+export default async function handler(req) {
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
     }
-
-    // Dynamic extraction logic to fix the body parsing bug
-    let taskInput = "";
-    if (typeof req.body === 'string') {
-        const parsed = JSON.parse(req.body);
-        taskInput = parsed.taskInput;
-    } else {
-        taskInput = req.body.taskInput;
-    }
-
-    if (!taskInput) {
-        return res.status(400).json({ error: 'Missing taskInput parameter' });
-    }
-
-    const systemInstruction = "You are an autonomous productivity saving agent. The user will give a task/deadline. Break it down into a clean HTML format. Output: 1. **Priority Score** (High/Medium/Low based on context), 2. **Action Plan** (3 clear immediate actionable steps), 3. **Proactive Blocker** (One warning about what usually goes wrong or causes delay). Avoid conversational filler, output raw clean structured breakdown with HTML tags like <p>, <ul>, <li>.";
 
     try {
+        // Safe Edge-runtime compliant body extraction
+        const { taskInput } = await req.json();
+
+        if (!taskInput) {
+            return new Response(JSON.stringify({ error: 'Missing taskInput parameter' }), { status: 400 });
+        }
+
+        const systemInstruction = "You are an autonomous productivity saving agent. The user will give a task/deadline. Break it down into a clean HTML format. Output: 1. **Priority Score** (High/Medium/Low based on context), 2. **Action Plan** (3 clear immediate actionable steps), 3. **Proactive Blocker** (One warning about what usually goes wrong or causes delay). Avoid conversational filler, output raw clean structured breakdown with HTML tags like <p>, <ul>, <li>.";
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -32,8 +30,12 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        return res.status(200).json(data);
+        return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+
     } catch (error) {
-        return res.status(500).json({ error: 'Internal Core Framework Exception' });
+        return new Response(JSON.stringify({ error: 'Internal Serverless Exception' }), { status: 500 });
     }
 }
