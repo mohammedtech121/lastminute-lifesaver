@@ -1,3 +1,7 @@
+// 🔥 Ultimate Hackathon Bypass - Direct API Call (No Vercel Routing Needed)
+// Niche quotes ke andar apni actual Gemini API key daal do!
+const API_KEY = "YAHAN_APNI_API_KEY_PASTE_KARO"; 
+
 document.getElementById('addBtn').addEventListener('click', handleAddTask);
 
 async function handleAddTask() {
@@ -18,25 +22,33 @@ async function handleAddTask() {
     const statusText = card.querySelector('.status-text');
     const aiResponseDiv = card.querySelector('.ai-response');
 
+    const systemInstruction = "You are an autonomous productivity saving agent. The user will give a task/deadline. Break it down into a clean HTML format. Output: 1. **Priority Score** (High/Medium/Low based on context), 2. **Action Plan** (3 clear immediate actionable steps), 3. **Proactive Blocker** (One warning about what usually goes wrong or causes delay). Avoid conversational filler, output raw clean structured breakdown with HTML tags like <p>, <ul>, <li>.";
+
     try {
-        // Automatic serverless internal routing hit
-        const response = await fetch('/api/generate', {
+        // Direct call to Google Gemini bypassing Vercel limits
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ taskInput })
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: `${systemInstruction}\n\nUser Task: ${taskInput}` }]
+                }]
+            })
         });
 
-        if (!response.ok) throw new Error('Backend communication failure');
-
         const data = await response.json();
-        const aiText = data.candidates[0].content.parts[0].text;
         
-        statusText.style.display = 'none';
-        aiResponseDiv.style.display = 'block';
-        aiResponseDiv.innerHTML = aiText.replace(/```html|```/g, '');
+        if (data.candidates && data.candidates[0]) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            statusText.style.display = 'none';
+            aiResponseDiv.style.display = 'block';
+            aiResponseDiv.innerHTML = aiText.replace(/```html|```/g, '');
+        } else {
+            throw new Error("Invalid API Key or Limit Exceeded");
+        }
 
     } catch (error) {
-        console.error("API Error:", error);
-        statusText.innerHTML = "<span style='color: #ef4444;'>❌ Agent communication error. Please check your network connection.</span>";
+        console.error("Error:", error);
+        statusText.innerHTML = "<span style='color: #ef4444;'>❌ Agent communication error. Please check if your API Key is correct.</span>";
     }
 }
