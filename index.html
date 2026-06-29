@@ -14,18 +14,25 @@
         </header>
 
         <main class="dashboard">
+            <!-- Secure Dynamic Vault Entry -->
             <section class="input-section">
-                <h2>Log New Task / Deadline</h2>
+                <h2>1. Authorization Vault</h2>
+                <input type="password" id="apiKeyVault" placeholder="Enter Gemini API Key to activate agent framework">
+            </section>
+
+            <!-- Task Input Section -->
+            <section class="input-section">
+                <h2>2. Log New Task / Deadline</h2>
                 <div class="input-group">
                     <input type="text" id="taskInput" placeholder="What needs to be done? (e.g., Submit project report by 5 PM)">
                     <button id="addBtn">Deploy Agent</button>
                 </div>
             </section>
 
+            <!-- Agentic Dashboard Section -->
             <section class="tasks-section">
                 <h2>Autonomous Task Execution Panel</h2>
-                <div id="taskList" class="task-list">
-                    </div>
+                <div id="taskList" class="task-list"></div>
             </section>
         </main>
     </div>
