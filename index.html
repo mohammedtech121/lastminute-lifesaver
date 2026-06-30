@@ -15,7 +15,16 @@
 
         <main class="dashboard">
             <section class="input-section">
-                <h2>Log New Task / Deadline</h2>
+                <h2>1. Authorization Vault</h2>
+                <p style="font-size: 0.9em; color: #a0aec0; margin-bottom: 10px;">For hackathon evaluation, please provide a Gemini API Key to test the agent.</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="password" id="apiKeyVault" placeholder="Paste your Gemini API Key here" style="flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #4a5568; background: #2d3748; color: white;">
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="padding: 12px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; white-space: nowrap;">Get API Key</a>
+                </div>
+            </section>
+
+            <section class="input-section">
+                <h2>2. Log New Task / Deadline</h2>
                 <div class="input-group">
                     <input type="text" id="taskInput" placeholder="What needs to be done? (e.g., Submit project report by 5 PM)">
                     <button id="addBtn">Deploy Agent</button>

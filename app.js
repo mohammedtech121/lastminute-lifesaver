@@ -1,17 +1,10 @@
-// ==========================================================================
-// 🚨 HACKATHON JUDGING NOTE: 
-// Due to last-minute Vercel Serverless Edge routing timeout issues, 
-// the Gemini API key is temporarily placed in the client-side code 
-// to ensure the judges can test the working prototype smoothly. 
-// In a real production environment, this is strictly handled via 
-// secure backend environment variables.
-// ==========================================================================
-const API_KEY = "AQ.Ab8RN6K2-TFl7rPWAIalF3xBMGJmDQUfi3L1OPu5Awygo1-mDQ";
-
 document.getElementById('addBtn').addEventListener('click', handleAddTask);
 
 async function handleAddTask() {
+    const API_KEY = document.getElementById('apiKeyVault').value.trim();
     const taskInput = document.getElementById('taskInput').value.trim();
+
+    if (!API_KEY) return alert("Please enter a Gemini API Key in the Authorization Vault first!");
     if (!taskInput) return alert("Please enter task details!");
 
     const taskList = document.getElementById('taskList');
@@ -31,7 +24,6 @@ async function handleAddTask() {
     const systemInstruction = "You are an autonomous productivity saving agent. The user will give a task/deadline. Break it down into a clean HTML format. Output: 1. **Priority Score** (High/Medium/Low based on context), 2. **Action Plan** (3 clear immediate actionable steps), 3. **Proactive Blocker** (One warning about what usually goes wrong or causes delay). Avoid conversational filler, output raw clean structured breakdown with HTML tags like <p>, <ul>, <li>.";
 
     try {
-        // Direct call to Google Gemini bypassing Vercel limits
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -50,11 +42,11 @@ async function handleAddTask() {
             aiResponseDiv.style.display = 'block';
             aiResponseDiv.innerHTML = aiText.replace(/```html|```/g, '');
         } else {
-            throw new Error("Invalid API Key or Limit Exceeded");
+            throw new Error("Invalid Key");
         }
 
     } catch (error) {
         console.error("Error:", error);
-        statusText.innerHTML = "<span style='color: #ef4444;'>❌ Agent communication error. Please check if your API Key is correct.</span>";
+        statusText.innerHTML = "<span style='color: #ef4444;'>❌ Agent communication error. Please check if your API Key is correct and valid.</span>";
     }
 }
